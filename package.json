@@ -1,11 +1,16 @@
 {
   "name": "midi-generator",
-  "version": "1.0.0",
+  "version": "0.0.3",
   "description": "",
   "main": "index.js",
+  "private": false,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Yuichi Yogo",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "midi": "^0.9.5",
+    "node-osc": "^2.0.4"
+  }
 }
