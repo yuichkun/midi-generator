@@ -1,36 +1,40 @@
-import { INote } from './MidiGenerator';
+import * as _ from 'lodash';
+import { Display } from './Display';
+import { IDisplayNote } from './MidiGenerator';
 import { midiState } from './constants/MIDI';
 
-enum COLORS {
-    BLACK   = '\u001b[30m',
-    RED     = '\u001b[31m',
-    GREEN   = '\u001b[32m',
-    YELLOW  = '\u001b[33m',
-    BLUE    = '\u001b[34m',
-    MAGENTA = '\u001b[35m',
-    CYAN    = '\u001b[36m',
-    WHITE   = '\u001b[37m',
-    RESET   = '\u001b[0m'
-}
-
-export class Logger{
-    static warn(text:any){
-        log(COLORS.RED, text);
+const display = new Display();
+export class Logger {
+    static notes: IDisplayNote[] = [];
+    static status = midiState.WAIT;
+    static start(){
+        setInterval(()=>{
+            console.log('\x1Bc'); //clear screen
+            display.system("NODE MIDI GENERATOR");
+            display.log(Logger.notes);
+        }, 100);
     }
-    static system(text:any){
-        bar();
-        log(COLORS.CYAN, text);
-        bar();
+    static pushNotes(note: IDisplayNote){
+        if(Logger.notes.length >= 7){
+            Logger.notes.splice(0,1);
+        }
+        Logger.notes.push(note);
     }
-    static midiInfo(note:INote, state:midiState){
-        const { port, channel, pitch } = note;
-        const stateMSG = state === midiState.ON ? "on" : "off";
-        log(COLORS.MAGENTA, `Port ${port} Channel ${channel} note ${stateMSG} ${pitch}`);
+    static deleteNote(note: IDisplayNote){
+        const index = _.findIndex(Logger.notes, note);
+        Logger.notes.splice(index, 1);
     }
-}
-function log(color:COLORS, text:any){
-    console.log(color + text + COLORS.RESET);
-}
-function bar(){
-    console.log(COLORS.YELLOW + '–––––––––––––––––––––––––––––––––' + COLORS.RESET);
+    static midiInfo(note:IDisplayNote, state:midiState){
+        Logger.status = state;
+        switch(state){
+            case midiState.ON:
+                Logger.pushNotes(note);
+                break;
+            case midiState.OFF:
+                Logger.deleteNote(note); 
+        }
+    }
+    static end(){
+        display.system("Flush all MIDI notes");
+    }
 }

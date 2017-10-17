@@ -5,17 +5,21 @@
   "main": "./lib/index.js",
   "private": false,
   "scripts": {
-    "start": "npm run rm; npm run build",
+    "start": "npm run rm; npm run build; npm test",
     "build": "tsc",
-    "rm": "rm lib/*"
+    "rm": "rm lib/*",
+    "test": "node lib/index.js"
   },
   "author": "Yuichi Yogo",
   "license": "ISC",
   "dependencies": {
+    "lodash": "^4.17.4",
     "midi": "^0.9.5",
     "node-osc": "^2.1.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.77",
+    "@types/node": "^8.0.41",
     "typescript": "^2.5.3"
   }
 }

@@ -1,4 +1,5 @@
 export enum midiState {
-    ON,
-    OFF
+    ON = "ON",
+    OFF = "OFF",
+    WAIT = "WAIT"
 }

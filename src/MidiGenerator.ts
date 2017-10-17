@@ -7,25 +7,32 @@ export interface INote {
     port: number;
     channel: number;
     pitch: number;
-    length: number;
+    length?: number;
+}
+
+export interface IDisplayNote {
+    pitch: number;
+    port: string;
+    channel: number;
 }
 
 export class MidiGenerator {
-    static noteOut(note:INote){
+    static noteOut(note:INote) {
         const { port, channel, pitch, length } = note;
-        Logger.midiInfo(note, midiState.ON);
+        const displayNote = MidiGenerator.extractNote(note);
+        Logger.midiInfo(displayNote, midiState.ON);
         midiOut.openPort(port);
         midiOut.sendMessage([144 + channel, pitch, 120]);
         midiOut.closePort(port);
 		setTimeout(() => {
-                Logger.midiInfo(note, midiState.OFF);
+                Logger.midiInfo(displayNote, midiState.OFF);
 				midiOut.openPort(port);
 				midiOut.sendMessage([128 + channel, pitch, 120]);
 				midiOut.closePort(port);
 		}, length);
     }
-    static flush(){
-        Logger.system("Flush all MIDI notes");
+    static flush() {
+        Logger.end();
         const portCount = midiOut.getPortCount();
         for(let i = 0; i < portCount; i++){
             midiOut.openPort(i);
@@ -35,5 +42,14 @@ export class MidiGenerator {
             midiOut.closePort(i);
         }
 
+    }
+    private static extractNote(note:INote): IDisplayNote{
+        const { port, channel, pitch } = note;
+        const portName = midiOut.getPortName(port);
+        return {
+            port: portName,
+            channel,
+            pitch
+        };
     }
 }
